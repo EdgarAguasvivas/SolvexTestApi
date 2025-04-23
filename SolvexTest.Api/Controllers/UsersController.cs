@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SolvexTest.Application.DTOs;
 using SolvexTest.Application.DTOs.Auth;
+using SolvexTest.Application.Features.Products.Queries.GetProductById;
 using SolvexTest.Application.Features.Users.Command.CreateUser;
 using SolvexTest.Application.Features.Users.Command.DeleteUser;
 using SolvexTest.Application.Features.Users.Command.UpdateUser;
+using SolvexTest.Application.Features.Users.Queries.GetUserById;
 using SolvexTest.Application.Features.Users.Queries.GetUsers;
 using SolvexTest.Application.Pagination;
 
@@ -26,6 +28,14 @@ namespace SolvexTest.Api.Controllers
         public async Task<ActionResult<PaginatedResult<UserDto>>> GetUsers([FromQuery] GetUsersQuery query)
         {
             return await _mediator.Send(query);
+        }
+
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Seller,User")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _mediator.Send(new GetUserByIdQuery { Id = id });
+            return result != null ? Ok(result) : NotFound();
         }
 
         [HttpPost]
